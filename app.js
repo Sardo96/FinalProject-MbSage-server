@@ -23,6 +23,12 @@ app.use('/api', indexRoutes);
 const massageRoutes = require('./routes/massages.routes');
 app.use('/api', massageRoutes);
 
+const bookingRoutes = require('./routes/bookings.routes');
+app.use('/api', bookingRoutes);
+
+const reviewRoutes = require('./routes/reviews.routes');
+app.use('/api', reviewRoutes);
+
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
 

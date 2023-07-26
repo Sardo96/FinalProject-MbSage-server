@@ -42,6 +42,10 @@ const userSchema = new Schema(
     },
     medications: {
       type: String
+    },
+    isAdmin: {
+      type: Boolean,
+      default: false
     }
   },
   {

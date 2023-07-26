@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const massageSchema = new Schema({
-  name: {
+  title: {
     type: String,
     required: true
   },
@@ -10,16 +10,30 @@ const massageSchema = new Schema({
     required: true
   },
   duration: {
-    type: String,
+    type: Number,
     required: true
   },
   price: {
-    type: String,
+    type: Number,
     required: true
   },
   image: {
     type: String
     // required: true
+  },
+  reviews: [{ type: mongoose.Types.ObjectId, ref: 'Review' }],
+  averageRating: {
+    type: Number,
+    default: 0
+  },
+  totalRating: {
+    type: Number,
+    default: 0
+  },
+  isApproved: {
+    type: String,
+    enum: ['pending', 'approved', 'cancelled'],
+    default: 'pending'
   }
 });
 

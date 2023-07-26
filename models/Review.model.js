@@ -1,25 +1,29 @@
 const { Schema, model } = require('mongoose');
 
-const reviewSchema = new Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+const reviewSchema = new Schema(
+  {
+    massage: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Massage'
+    },
+    user: {
+      type: mongoose.Types.ObjectId,
+      ref: 'User'
+    },
+    reviewText: {
+      type: String,
+      required: true
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 0,
+      max: 5,
+      default: 0
+    }
   },
-  bookingId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Booking',
-    required: true
-  },
-  rating: {
-    type: Number,
-    required: true
-  },
-  comment: {
-    type: String,
-    required: true
-  }
-});
+  { timestamps: true }
+);
 
 const Review = model('Review', reviewSchema);
 

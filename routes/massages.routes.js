@@ -12,7 +12,8 @@ router.post('/massages', async (req, res, next) => {
       description,
       duration,
       price,
-      image
+      image,
+      reviews: []
     });
 
     res.json(newMassage);
@@ -40,7 +41,7 @@ router.get('/massages/:id', async (req, res, next) => {
       return res.status(400).json({ message: 'Specified id is not valid' });
     }
 
-    const massage = await Massage.findById(id);
+    const massage = await Massage.findById(id).populate('reviews');
 
     if (!massage) {
       return res.status(404).json({ message: 'No massage found with that id' });

@@ -129,6 +129,21 @@ router.post('/login', async (req, res, next) => {
   }
 });
 
+router.get('/profile', async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const currentUser = await User.findById(id);
+    if (!currentUser) {
+      return res.status(404).json({ message: 'No user found with that id' });
+    }
+
+    res.json(currentUser);
+  } catch (error) {
+    console.log('An error occurred getting the currentUser', error);
+    next(error);
+  }
+});
+
 router.get('/verify', isAuthenticated, (req, res, next) => {
   console.log('req.payload', req.payload);
 

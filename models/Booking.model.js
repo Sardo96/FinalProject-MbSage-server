@@ -6,13 +6,22 @@ const bookingSchema = new Schema({
     ref: 'User',
     required: true
   },
-  dateTime: {
+  massage: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Massage',
+    required: true
+  },
+  appointmentDate: {
     type: Date,
     required: true
   },
-  status: {
+  name: {
     type: String,
-    default: 'Pending'
+    required: true
+  },
+  phone: {
+    type: String,
+    required: true
   }
 });
 
