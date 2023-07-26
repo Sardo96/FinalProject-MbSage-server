@@ -3,11 +3,11 @@ const { Schema, model } = require('mongoose');
 const reviewSchema = new Schema(
   {
     massage: {
-      type: mongoose.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'Massage'
     },
     user: {
-      type: mongoose.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'User'
     },
     reviewText: {

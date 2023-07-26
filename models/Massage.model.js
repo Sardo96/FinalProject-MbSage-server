@@ -21,7 +21,7 @@ const massageSchema = new Schema({
     type: String
     // required: true
   },
-  reviews: [{ type: mongoose.Types.ObjectId, ref: 'Review' }],
+  reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
   averageRating: {
     type: Number,
     default: 0

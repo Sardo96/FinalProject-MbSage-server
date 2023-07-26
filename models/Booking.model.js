@@ -2,12 +2,12 @@ const { Schema, model } = require('mongoose');
 
 const bookingSchema = new Schema({
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
   massage: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'Massage',
     required: true
   },
