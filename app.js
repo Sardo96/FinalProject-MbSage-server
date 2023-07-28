@@ -20,14 +20,17 @@ require('./config')(app);
 const indexRoutes = require('./routes/index.routes');
 app.use('/api', indexRoutes);
 
-const massageRoutes = require('./routes/massages.routes');
+const massageRoutes = require('./routes/massage.routes');
 app.use('/api', massageRoutes);
 
-const bookingRoutes = require('./routes/bookings.routes');
+const bookingRoutes = require('./routes/booking.routes');
 app.use('/api', bookingRoutes);
 
-const reviewRoutes = require('./routes/reviews.routes');
+const reviewRoutes = require('./routes/review.routes');
 app.use('/api', reviewRoutes);
+
+const profileRoutes = require('./routes/profile.routes');
+app.use('/api', profileRoutes);
 
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
