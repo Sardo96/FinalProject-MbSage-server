@@ -3,8 +3,9 @@ const Massage = require('../models/Massage.model');
 const mongoose = require('mongoose');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
 const fileUploader = require('../config/cloudinary.config');
+const { isAdmin } = require('../middleware/admin.middleware');
 
-router.post('/massages', isAuthenticated, async (req, res, next) => {
+router.post('/massages', isAdmin, async (req, res, next) => {
   const { title, description, duration, price, image } = req.body;
 
   try {
@@ -57,7 +58,7 @@ router.get('/massage/:id', async (req, res, next) => {
   }
 });
 
-router.put('/massage/:id', isAuthenticated, async (req, res, next) => {
+router.put('/massage/:id', isAdmin, async (req, res, next) => {
   const { id } = req.params;
   const { title, description, duration, price } = req.body;
 
@@ -90,7 +91,7 @@ router.put('/massage/:id', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.delete('/massage/:id', isAuthenticated, async (req, res, next) => {
+router.delete('/massage/:id', isAdmin, async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -108,20 +109,13 @@ router.delete('/massage/:id', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.post(
-  '/upload',
-  isAuthenticated,
-  fileUploader.single('file'),
-  (req, res) => {
-    try {
-      res.json({ fileUrl: req.file.path });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: 'An error occurred uploading the image' });
-      next(error);
-    }
+router.post('/upload', isAdmin, fileUploader.single('file'), (req, res) => {
+  try {
+    res.json({ fileUrl: req.file.path });
+  } catch (error) {
+    res.status(500).json({ message: 'An error occurred uploading the image' });
+    next(error);
   }
-);
+});
 
 module.exports = router;

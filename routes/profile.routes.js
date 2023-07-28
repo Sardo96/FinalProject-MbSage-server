@@ -1,7 +1,9 @@
 const router = require('express').Router();
 const User = require('../models/User.model');
+const mongoose = require('mongoose');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
 const fileUploader = require('../config/cloudinary.config');
+const { isAdmin } = require('../middleware/admin.middleware');
 
 router.get('/profile', isAuthenticated, async (req, res, next) => {
   try {
@@ -23,6 +25,37 @@ router.get('/profile', isAuthenticated, async (req, res, next) => {
     });
   } catch (error) {
     console.log('An error occurred fetching the user profile', error);
+    next(error);
+  }
+});
+
+router.get('/profile/all', isAdmin, async (req, res, next) => {
+  try {
+    const allProfiles = await User.find();
+    res.json(allProfiles);
+  } catch (error) {
+    console.log('An error occurred getting all profiles', error);
+    next(error);
+  }
+});
+
+router.get('/profile/:id', isAdmin, async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Specified id is not valid' });
+    }
+
+    const profile = await User.findById(id);
+
+    if (!profile) {
+      return res.status(404).json({ message: 'No profile found with that id' });
+    }
+
+    res.json(profile);
+  } catch (error) {
+    console.log('An error occurred getting the profile', error);
     next(error);
   }
 });

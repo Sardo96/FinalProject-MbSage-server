@@ -3,6 +3,7 @@ const Booking = require('../models/Booking.model');
 const Massage = require('../models/Massage.model');
 const mongoose = require('mongoose');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
+const { isAdmin } = require('../middleware/admin.middleware');
 
 router.post('/bookings', isAuthenticated, async (req, res, next) => {
   const { appointmentDate, name, phone } = req.body;
@@ -35,7 +36,7 @@ router.post('/bookings', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.get('/bookings', isAuthenticated, async (req, res, next) => {
+router.get('/bookings', isAdmin, async (req, res, next) => {
   try {
     const allBookings = await Booking.find();
     res.json(allBookings);
@@ -96,7 +97,7 @@ router.get('/bookings/:id', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.put('/bookings/:id', isAuthenticated, async (req, res, next) => {
+router.put('/bookings/:id', isAdmin, async (req, res, next) => {
   const { id } = req.params;
   const { appointmentDate, name, phone, status } = req.body;
 
@@ -129,26 +130,22 @@ router.put('/bookings/:id', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.delete(
-  '/bookings/:bookingId',
-  isAuthenticated,
-  async (req, res, next) => {
-    const { bookingId } = req.params;
+router.delete('/bookings/:bookingId', isAdmin, async (req, res, next) => {
+  const { bookingId } = req.params;
 
-    try {
-      if (!mongoose.Types.ObjectId.isValid(bookingId)) {
-        return res.status(400).json({ message: 'Specified id is not valid' });
-      }
-
-      await Booking.findByIdAndDelete(bookingId);
-      res.json({
-        message: `Booking with id ${bookingId} has been deleted successfully`
-      });
-    } catch (error) {
-      console.log('An error occurred deleting the booking', error);
-      next(error);
+  try {
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+      return res.status(400).json({ message: 'Specified id is not valid' });
     }
+
+    await Booking.findByIdAndDelete(bookingId);
+    res.json({
+      message: `Booking with id ${bookingId} has been deleted successfully`
+    });
+  } catch (error) {
+    console.log('An error occurred deleting the booking', error);
+    next(error);
   }
-);
+});
 
 module.exports = router;
