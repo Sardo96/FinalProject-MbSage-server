@@ -1,7 +1,6 @@
 const router = require('express').Router();
 const Massage = require('../models/Massage.model');
 const mongoose = require('mongoose');
-const { isAuthenticated } = require('../middleware/jwt.middleware');
 const fileUploader = require('../config/cloudinary.config');
 const { isAdmin } = require('../middleware/admin.middleware');
 
