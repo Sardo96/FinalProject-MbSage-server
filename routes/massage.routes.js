@@ -1,19 +1,22 @@
 const router = require('express').Router();
 const Massage = require('../models/Massage.model');
 const mongoose = require('mongoose');
+const { isAuthenticated } = require('../middleware/jwt.middleware');
 const fileUploader = require('../config/cloudinary.config');
 
-router.post('/massages', async (req, res, next) => {
-  const { name, description, duration, price, image } = req.body;
+router.post('/massages', isAuthenticated, async (req, res, next) => {
+  const { title, description, duration, price, image } = req.body;
 
   try {
     const newMassage = await Massage.create({
-      name,
+      title,
       description,
       duration,
       price,
       image,
-      reviews: []
+      reviews: [],
+      averageRating: 0,
+      totalRating: 0
     });
 
     res.json(newMassage);
@@ -25,7 +28,7 @@ router.post('/massages', async (req, res, next) => {
 
 router.get('/massages', async (req, res, next) => {
   try {
-    const allMassages = await Massage.find();
+    const allMassages = await Massage.find().populate('reviews');
     res.json(allMassages);
   } catch (error) {
     console.log('An error occurred getting all massages', error);
@@ -33,7 +36,7 @@ router.get('/massages', async (req, res, next) => {
   }
 });
 
-router.get('/massages/:id', async (req, res, next) => {
+router.get('/massage/:id', async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -54,9 +57,9 @@ router.get('/massages/:id', async (req, res, next) => {
   }
 });
 
-router.put('/massages/:id', async (req, res, next) => {
+router.put('/massage/:id', isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
-  const { name, description, duration, price, image } = req.body;
+  const { title, description, duration, price } = req.body;
 
   try {
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -66,14 +69,13 @@ router.put('/massages/:id', async (req, res, next) => {
     const updatedMassage = await Massage.findByIdAndUpdate(
       id,
       {
-        name,
+        title,
         description,
         duration,
-        price,
-        image
+        price
       },
       { new: true }
-    );
+    ).populate('reviews');
 
     if (!updatedMassage) {
       return res
@@ -88,7 +90,7 @@ router.put('/massages/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/massages/:id', async (req, res, next) => {
+router.delete('/massage/:id', isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -97,20 +99,29 @@ router.delete('/massages/:id', async (req, res, next) => {
     }
 
     await Massage.findByIdAndDelete(id);
-    res.json({ message: `Massage with id ${id} has deleted successfully` });
+    res.json({
+      message: `Massage with id ${id} has been deleted successfully`
+    });
   } catch (error) {
     console.log('An error occurred deleting the massage', error);
     next(error);
   }
 });
 
-router.post('/upload', fileUploader.single('file'), (req, res) => {
-  try {
-    res.json({ fileUrl: req.file.path });
-  } catch (error) {
-    res.status(500).json({ message: 'An error occurred uploading the image' });
-    next(error);
+router.post(
+  '/upload',
+  isAuthenticated,
+  fileUploader.single('file'),
+  (req, res) => {
+    try {
+      res.json({ fileUrl: req.file.path });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: 'An error occurred uploading the image' });
+      next(error);
+    }
   }
-});
+);
 
 module.exports = router;

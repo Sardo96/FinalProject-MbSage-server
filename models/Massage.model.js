@@ -19,7 +19,6 @@ const massageSchema = new Schema({
   },
   image: {
     type: String
-    // required: true
   },
   reviews: [{ type: Schema.Types.ObjectId, ref: 'Review' }],
   averageRating: {
@@ -29,11 +28,6 @@ const massageSchema = new Schema({
   totalRating: {
     type: Number,
     default: 0
-  },
-  isApproved: {
-    type: String,
-    enum: ['pending', 'approved', 'cancelled'],
-    default: 'pending'
   }
 });
 

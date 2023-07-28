@@ -3,10 +3,11 @@ const User = require('../models/User.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
+const fileUploader = require('../config/cloudinary.config');
 
 const saltRounds = 10;
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', fileUploader.single('photo'), async (req, res, next) => {
   const {
     firstName,
     lastName,
@@ -14,10 +15,9 @@ router.post('/signup', async (req, res, next) => {
     password,
     birthday,
     phone,
-    address,
-    medicalConditions,
-    allergies,
-    medications
+    gender,
+    role,
+    allergies
   } = req.body;
 
   try {
@@ -28,7 +28,7 @@ router.post('/signup', async (req, res, next) => {
       password === '' ||
       birthday === '' ||
       phone === '' ||
-      address === ''
+      gender === ''
     ) {
       return res.status(400).json({ message: 'Fill the mandatory fields' });
     }
@@ -57,6 +57,11 @@ router.post('/signup', async (req, res, next) => {
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashedPassword = bcrypt.hashSync(password, salt);
 
+    let photo = null;
+    if (req.file) {
+      photo = req.file.path;
+    }
+
     const newUser = await User.create({
       firstName,
       lastName,
@@ -64,10 +69,10 @@ router.post('/signup', async (req, res, next) => {
       email,
       password: hashedPassword,
       phone,
-      address,
-      allergies,
-      medicalConditions,
-      medications
+      gender,
+      photo,
+      role,
+      allergies
     });
 
     res.json({
@@ -77,10 +82,10 @@ router.post('/signup', async (req, res, next) => {
       email: newUser.email,
       _id: newUser._id,
       phone: newUser.phone,
-      address: newUser.address,
-      allergies: newUser.allergies,
-      medicalConditions: newUser.medicalConditions,
-      medications: newUser.medications
+      gender: newUser.gender,
+      photo: newUser.photo,
+      role: newUser.role,
+      allergies: newUser.allergies
     });
   } catch (error) {
     console.log('An error occurred creating the user', error);
@@ -125,21 +130,6 @@ router.post('/login', async (req, res, next) => {
     }
   } catch (error) {
     console.log('An error occurred login in the user', error);
-    next(error);
-  }
-});
-
-router.get('/profile', async (req, res, next) => {
-  const { id } = req.params;
-  try {
-    const currentUser = await User.findById(id);
-    if (!currentUser) {
-      return res.status(404).json({ message: 'No user found with that id' });
-    }
-
-    res.json(currentUser);
-  } catch (error) {
-    console.log('An error occurred getting the currentUser', error);
     next(error);
   }
 });

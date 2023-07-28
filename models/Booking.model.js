@@ -6,7 +6,7 @@ const bookingSchema = new Schema({
     ref: 'User',
     required: true
   },
-  massage: {
+  massageId: {
     type: Schema.Types.ObjectId,
     ref: 'Massage',
     required: true
@@ -15,9 +15,18 @@ const bookingSchema = new Schema({
     type: Date,
     required: true
   },
+  endTime: {
+    type: Date,
+    required: true
+  },
   name: {
     type: String,
     required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'cancelled', 'finished'],
+    default: 'pending'
   },
   phone: {
     type: String,

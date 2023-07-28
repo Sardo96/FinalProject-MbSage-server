@@ -27,26 +27,26 @@ const userSchema = new Schema(
       required: [true, 'Password is required.']
     },
     phone: {
-      type: String,
+      type: Number,
       required: [true, 'Phone number is required.']
     },
-    address: {
+    gender: {
       type: String,
-      required: [true, 'Address is required.']
+      enum: ['male', 'female', 'other'],
+      required: [true, 'This information is required']
     },
-    medicalConditions: {
+    photo: {
       type: String
+    },
+    role: {
+      type: String,
+      enum: ['patient', 'admin'],
+      default: 'patient'
     },
     allergies: {
       type: String
     },
-    medications: {
-      type: String
-    },
-    isAdmin: {
-      type: Boolean,
-      default: false
-    }
+    appointments: [{ type: Schema.Types.ObjectId, ref: 'Appointment' }]
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`
