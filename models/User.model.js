@@ -33,7 +33,7 @@ const userSchema = new Schema(
     gender: {
       type: String,
       enum: ['male', 'female', 'other'],
-      required: [true, 'This information is required']
+      required: [false, 'This information is required']
     },
     photo: {
       type: String
