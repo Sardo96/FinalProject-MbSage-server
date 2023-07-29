@@ -108,7 +108,7 @@ router.delete('/massage/:id', isAdmin, async (req, res, next) => {
   }
 });
 
-router.post('/upload', isAdmin, fileUploader.single('file'), (req, res) => {
+router.post('/upload', fileUploader.single('file'), (req, res) => {
   try {
     res.json({ fileUrl: req.file.path });
   } catch (error) {

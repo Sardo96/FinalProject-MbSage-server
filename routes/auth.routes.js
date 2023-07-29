@@ -7,7 +7,7 @@ const fileUploader = require('../config/cloudinary.config');
 
 const saltRounds = 10;
 
-router.post('/signup', fileUploader.single('photo'), async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
   const {
     firstName,
     lastName,
@@ -16,9 +16,12 @@ router.post('/signup', fileUploader.single('photo'), async (req, res, next) => {
     birthday,
     phone,
     gender,
+    photo,
     role,
     allergies
   } = req.body;
+
+  console.log('Received photo:', photo);
 
   try {
     if (
@@ -56,11 +59,6 @@ router.post('/signup', fileUploader.single('photo'), async (req, res, next) => {
 
     const salt = bcrypt.genSaltSync(saltRounds);
     const hashedPassword = bcrypt.hashSync(password, salt);
-
-    let photo = null;
-    if (req.file) {
-      photo = req.file.path;
-    }
 
     const newUser = await User.create({
       firstName,
@@ -116,12 +114,13 @@ router.post('/login', async (req, res, next) => {
         _id: user._id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName
+        lastName: user.lastName,
+        role: user.role
       };
 
       const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
         algorithm: 'HS256',
-        expiresIn: '6H'
+        expiresIn: '1H'
       });
 
       res.json({ authToken });
