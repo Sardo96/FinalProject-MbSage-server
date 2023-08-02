@@ -45,8 +45,7 @@ const userSchema = new Schema(
     },
     allergies: {
       type: String
-    },
-    appointments: [{ type: Schema.Types.ObjectId, ref: 'Appointment' }]
+    }
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

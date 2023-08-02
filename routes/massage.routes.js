@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const fileUploader = require('../config/cloudinary.config');
 const { isAdmin } = require('../middleware/admin.middleware');
 
-router.post('/massages', isAdmin, async (req, res, next) => {
+router.post('/massages', async (req, res, next) => {
   const { title, description, duration, price, image } = req.body;
 
   try {
@@ -36,7 +36,7 @@ router.get('/massages', async (req, res, next) => {
   }
 });
 
-router.get('/massage/:id', async (req, res, next) => {
+router.get('/massages/:id', async (req, res, next) => {
   const { id } = req.params;
 
   try {
@@ -57,7 +57,7 @@ router.get('/massage/:id', async (req, res, next) => {
   }
 });
 
-router.put('/massage/:id', isAdmin, async (req, res, next) => {
+router.put('/massage/:id', async (req, res, next) => {
   const { id } = req.params;
   const { title, description, duration, price } = req.body;
 
@@ -90,7 +90,7 @@ router.put('/massage/:id', isAdmin, async (req, res, next) => {
   }
 });
 
-router.delete('/massage/:id', isAdmin, async (req, res, next) => {
+router.delete('/massage/:id', async (req, res, next) => {
   const { id } = req.params;
 
   try {

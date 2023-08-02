@@ -6,12 +6,10 @@ const { isAuthenticated } = require('../middleware/jwt.middleware');
 
 router.post('/reviews', isAuthenticated, async (req, res, next) => {
   const { reviewText, rating, massageId } = req.body;
-  const userId = req.payload._id;
 
   try {
     const newReview = await Review.create({
       massage: massageId,
-      user: userId,
       reviewText,
       rating
     });

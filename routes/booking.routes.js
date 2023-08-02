@@ -17,7 +17,7 @@ router.post('/bookings', isAuthenticated, async (req, res, next) => {
     }
     const massageDuration = massage.duration;
 
-    const endTime = new Date(appointmentDate);
+    let endTime = new Date(appointmentDate);
     endTime.setMinutes(endTime.getMinutes() + massageDuration);
 
     const newBooking = await Booking.create({
@@ -46,35 +46,35 @@ router.get('/bookings', isAdmin, async (req, res, next) => {
   }
 });
 
-router.get(
-  '/bookings/date/:selectedDate',
-  isAuthenticated,
-  async (req, res, next) => {
-    const { selectedDate } = req.params;
+// router.get(
+//   '/bookings/date/:selectedDate',
+//   isAuthenticated,
+//   async (req, res, next) => {
+//     const { selectedDate } = req.params;
 
-    try {
-      const date = new Date(selectedDate);
-      if (isNaN(date.getTime())) {
-        return res.status(400).json({ message: 'Invalid date format' });
-      }
+//     try {
+//       const date = new Date(selectedDate);
+//       if (isNaN(date.getTime())) {
+//         return res.status(400).json({ message: 'Invalid date format' });
+//       }
 
-      const nextDay = new Date(date);
-      nextDay.setDate(nextDay.getDate() + 1);
+//       const nextDay = new Date(date);
+//       nextDay.setDate(nextDay.getDate() + 1);
 
-      const bookings = await Booking.find({
-        appointmentDate: { $gte: date, $lt: nextDay }
-      });
+//       const bookings = await Booking.find({
+//         appointmentDate: { $gte: date, $lt: nextDay }
+//       });
 
-      res.json(bookings);
-    } catch (error) {
-      console.log(
-        'An error occurred getting all appointments for a date',
-        error
-      );
-      next(error);
-    }
-  }
-);
+//       res.json(bookings);
+//     } catch (error) {
+//       console.log(
+//         'An error occurred getting all appointments for a date',
+//         error
+//       );
+//       next(error);
+//     }
+//   }
+// );
 
 router.get('/bookings/:id', isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
@@ -97,7 +97,7 @@ router.get('/bookings/:id', isAuthenticated, async (req, res, next) => {
   }
 });
 
-router.put('/bookings/:id', isAdmin, async (req, res, next) => {
+router.put('/bookings/:id', async (req, res, next) => {
   const { id } = req.params;
   const { appointmentDate, name, phone, status } = req.body;
 
@@ -106,10 +106,31 @@ router.put('/bookings/:id', isAdmin, async (req, res, next) => {
       return res.status(400).json({ message: 'Specified id is not valid' });
     }
 
+    // Retrieve the original booking from the database
+    const originalBooking = await Booking.findById(id);
+    if (!originalBooking) {
+      return res
+        .status(404)
+        .json({ message: 'No booking found with specified id' });
+    }
+
+    // Calculate endTime using the massage duration and the new appointmentDate
+    const massageId = originalBooking.massageId;
+    const massage = await Massage.findById(massageId);
+    if (!massage) {
+      return res.status(404).json({ message: 'No massage found with that id' });
+    }
+
+    const massageDuration = massage.duration;
+    let endTime = new Date(appointmentDate);
+    endTime.setMinutes(endTime.getMinutes() + massageDuration);
+
+    // Update the booking with the new values, including endTime and appointmentDate
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
       {
         appointmentDate,
+        endTime,
         name,
         phone,
         status
@@ -130,17 +151,17 @@ router.put('/bookings/:id', isAdmin, async (req, res, next) => {
   }
 });
 
-router.delete('/bookings/:bookingId', isAdmin, async (req, res, next) => {
-  const { bookingId } = req.params;
+router.delete('/bookings/:id', isAdmin, async (req, res, next) => {
+  const { id } = req.params;
 
   try {
-    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Specified id is not valid' });
     }
 
-    await Booking.findByIdAndDelete(bookingId);
+    await Booking.findByIdAndDelete(id);
     res.json({
-      message: `Booking with id ${bookingId} has been deleted successfully`
+      message: `Booking with id ${id} has been deleted successfully`
     });
   } catch (error) {
     console.log('An error occurred deleting the booking', error);

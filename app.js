@@ -28,7 +28,7 @@ const reviewRoutes = require('./routes/review.routes');
 app.use('/api', reviewRoutes);
 
 const profileRoutes = require('./routes/profile.routes');
-app.use('/api', profileRoutes);
+app.use('/auth', profileRoutes);
 
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);
