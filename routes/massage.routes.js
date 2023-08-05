@@ -16,7 +16,8 @@ router.post('/massages', async (req, res, next) => {
       image,
       reviews: [],
       averageRating: 0,
-      totalRating: 0
+      totalRating: 0,
+      totalReviews: 0
     });
 
     res.json(newMassage);
@@ -45,7 +46,7 @@ router.get('/massages/:id', async (req, res, next) => {
     }
 
     const massage = await Massage.findById(id).populate('reviews');
-
+    console.log(massage.reviews);
     if (!massage) {
       return res.status(404).json({ message: 'No massage found with that id' });
     }
@@ -57,7 +58,7 @@ router.get('/massages/:id', async (req, res, next) => {
   }
 });
 
-router.put('/massage/:id', async (req, res, next) => {
+router.put('/massages/:id', async (req, res, next) => {
   const { id } = req.params;
   const { title, description, duration, price } = req.body;
 
@@ -90,7 +91,7 @@ router.put('/massage/:id', async (req, res, next) => {
   }
 });
 
-router.delete('/massage/:id', async (req, res, next) => {
+router.delete('/massages/:id', async (req, res, next) => {
   const { id } = req.params;
 
   try {

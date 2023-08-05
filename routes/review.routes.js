@@ -5,31 +5,33 @@ const mongoose = require('mongoose');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
 
 router.post('/reviews', isAuthenticated, async (req, res, next) => {
-  const { reviewText, rating, massageId } = req.body;
+  const { reviewText, rating, massageId, userId } = req.body;
 
   try {
+    console.log(userId);
     const newReview = await Review.create({
       massage: massageId,
+      user: userId,
       reviewText,
       rating
     });
 
     await Massage.findByIdAndUpdate(massageId, {
       $push: { reviews: newReview._id },
-      $inc: { totalRating: rating }
+      $inc: { totalRating: rating, totalReviews: 1 }
     });
 
-    const massage = await Massage.findById(massageId);
+    const massage = await Massage.findById(massageId).populate('reviews');
 
     if (!massage) {
       return res.status(404).json({ message: 'No massage found with that id' });
     }
 
-    const existingReviews = massage.reviews.length;
+    const existingReviews = massage.totalReviews;
     const newTotalRating = massage.totalRating;
-    const newAverageRating = (newTotalRating + rating) / (existingReviews + 1);
+    const newAverageRating = newTotalRating / existingReviews;
 
-    massage.averageRating = newAverageRating;
+    massage.averageRating = newAverageRating.toFixed(1);
 
     await massage.save();
 
@@ -148,7 +150,8 @@ router.delete('/reviews/:reviewId', isAuthenticated, async (req, res, next) => {
     }
 
     await Massage.findByIdAndUpdate(review.massage, {
-      $pull: { reviews: review._id }
+      $pull: { reviews: review._id },
+      $inc: { totalReviews: -1 }
     });
 
     await Review.findByIdAndDelete(reviewId);

@@ -25,6 +25,10 @@ const massageSchema = new Schema({
     type: Number,
     default: 0
   },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
   totalRating: {
     type: Number,
     default: 0
